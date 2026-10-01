@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HD Enhancer — Foto & Video</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #08080c;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 540px;
+            width: 100%;
+            background: rgba(20, 20, 30, 0.75);
+            backdrop-filter: blur(24px);
+            border-radius: 40px;
+            padding: 32px 26px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .header .icon {
+            font-size: 42px;
+            color: #a855f7;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 6px;
+        }
+
+        .tab-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 14px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(168, 85, 247, 0.2);
+            border-radius: 24px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background: rgba(255, 255, 255, 0.01);
+            margin-bottom: 18px;
+        }
+
+        .drop-zone:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            background: rgba(168, 85, 247, 0.04);
+        }
+
+        .drop-zone.dragover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.08);
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-zone .dz-icon {
+            font-size: 36px;
+            color: rgba(168, 85, 247, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .drop-zone .dz-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .drop-zone .dz-text span {
+            color: #a855f7;
+            font-weight: 600;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .controls select {
+            flex: 1;
+            padding: 12px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .controls select:focus {
+            border-color: #a855f7;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-enhance {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.25);
+        }
+
+        .btn-enhance:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-enhance:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-download {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            margin-top: 10px;
+            display: none;
+        }
+
+        .btn-download:hover {
+            background: rgba(34, 197, 94, 0.25);
+        }
+
+        .preview-area {
+            display: none;
+            margin-top: 18px;
+        }
+
+        .preview-area.show {
+            display: block;
+        }
+
+        .preview-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .preview-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .preview-box img,
+        .preview-box video {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 14px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(168, 85, 247, 0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+            border-radius: 10px;
+            transition: width 0.2s;
+        }
+
+        .info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.25);
+            text-align: center;
+            margin-top: 14px;
+            line-height: 1.5;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a24;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            padding: 12px 22px;
+            border-radius: 60px;
+            color: #fff;
+            font-size: 13px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            display: block;
+            animation: toastIn 0.3s ease;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(15px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 24px 18px; border-radius: 32px; }
+            .header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="icon"><i class="fas fa-magic"></i></div>
+        <h1>HD Enhancer</h1>
+        <p>Ubah foto & video buram jadi HD</p>
+    </div>
+
+    <!-- Tab -->
+    <div class="tab-row">
+        <button class="tab-btn active" data-tab="photo"><i class="fas fa-image"></i> Foto</button>
+        <button class="tab-btn" data-tab="video"><i class="fas fa-video"></i> Video</button>
+    </div>
+
+    <!-- FOTO TAB -->
+    <div class="tab-content active" id="tab-photo">
+        <div class="drop-zone" id="photoDropZone">
+            <div class="dz-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="dz-text">Drag & drop foto atau <span>klik untuk pilih</span></div>
+            <input type="file" id="photoInput" accept="image/*">
+        </div>
+
+        <div class="controls">
+            <select id="photoScale">
+                <option value="2">2x Upscale (HD)</option>
+                <option value="3">3x Upscale (Full HD)</option>
+                <option value="4">4x Upscale (Ultra HD)</option>
+            </select>
+        </div>
+
+        <button class="btn btn-enhance" id="photoEnhanceBtn" disabled>
+            <i class="fas fa-wand-magic-sparkles"></i> Enhance Foto ke HD
+        </button>
+
+        <div class="loading" id="photoLoading">
+            <div class="spinner"></div>
+            <p>Memproses foto...</p>
+        </div>
+
+        <div class="preview-area" id="photoPreviewArea">
+            <div class="preview-label"><i class="fas fa-image"></i> Hasil HD</div>
+            <div class="preview-box">
+                <img id="photoResult" src="" alt="Hasil HD">
+            </div>
+            <button class="btn btn-download" id="photoDownloadBtn">
+                <i class="fas fa-download"></i> Download Foto HD
+            </button>
+        </div>
+    </div>
+
+    <!-- VIDEO TAB -->
+    <div class="tab-content" id="tab-video">
+        <div class="drop-zone" id="videoDropZone">
+            <div class="dz-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="dz-text">Drag & drop video atau <span>klik untuk pilih</span></div>
+            <input type="file" id="videoInput" accept="video/*">
+        </div>
+
+        <div class="controls">
+            <select id="videoScale">
+                <option value="1.5">1.5x Upscale</option>
+                <option value="2">2x Upscale (HD)</option>
+            </select>
+        </div>
+
+        <button class="btn btn-enhance" id="videoEnhanceBtn" disabled>
+            <i class="fas fa-wand-magic-sparkles"></i> Enhance Video ke HD
+        </button>
+
+        <div class="loading" id="videoLoading">
+            <div class="spinner"></div>
+            <p id="videoLoadingText">Memproses video...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="videoProgress"></div>
+            </div>
+        </div>
+
+        <div class="preview-area" id="videoPreviewArea">
+            <div class="preview-label"><i class="fas fa-video"></i> Hasil HD</div>
+            <div class="preview-box">
+                <video id="videoResult" controls></video>
+            </div>
+            <button class="btn btn-download" id="videoDownloadBtn">
+                <i class="fas fa-download"></i> Download Video HD
+            </button>
+        </div>
+
+        <div class="info">
+            <i class="fas fa-info-circle"></i> Video diproses secara bertahap. Semakin panjang videonya, semakin lama prosesnya.
+        </div>
+    </div>
+
+    <div class="info" id="photoInfo">
+        <i class="fas fa-info-circle"></i> Semua diproses langsung di browser kamu. Tidak diupload ke server.
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const toast = document.getElementById('toast');
+
+    function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ===== TAB SWITCH =====
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ===== FOTO =====
+    const photoDropZone = document.getElementById('photoDropZone');
+    const photoInput = document.getElementById('photoInput');
+    const photoEnhanceBtn = document.getElementById('photoEnhanceBtn');
+    const photoLoading = document.getElementById('photoLoading');
+    const photoPreviewArea = document.getElementById('photoPreviewArea');
+    const photoResult = document.getElementById('photoResult');
+    const photoDownloadBtn = document.getElementById('photoDownloadBtn');
+    const photoScale = document.getElementById('photoScale');
+
+    let originalPhoto = null;
+    let photoFileName = '';
+
+    function handlePhotoFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showToast('❌ File harus berupa gambar!');
+            return;
+        }
+        photoFileName = file.name.replace(/\.[^/.]+$/, '');
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                originalPhoto = img;
+                photoEnhanceBtn.disabled = false;
+                photoPreviewArea.classList.remove('show');
+                photoDownloadBtn.style.display = 'none';
+                showToast('✅ Foto siap di-enhance!');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    photoDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        photoDropZone.classList.add('dragover');
+    });
+
+    photoDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        photoDropZone.classList.remove('dragover');
+    });
+
+    photoDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        photoDropZone.classList.remove('dragover');
+        handlePhotoFile(e.dataTransfer.files[0]);
+    });
+
+    photoDropZone.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') photoInput.click();
+    });
+
+    photoInput.addEventListener('change', function() {
+        if (this.files[0]) handlePhotoFile(this.files[0]);
+        this.value = '';
+    });
+
+    photoEnhanceBtn.addEventListener('click', async () => {
+        if (!originalPhoto) return;
+        const scale = parseInt(photoScale.value);
+        photoEnhanceBtn.disabled = true;
+        photoPreviewArea.classList.remove('show');
+        photoLoading.classList.add('show');
+
+        await new Promise(r => setTimeout(r, 700));
+
+        try {
+            const result = await enhanceImage(originalPhoto, scale);
+            photoResult.src = result;
+            photoPreviewArea.classList.add('show');
+            photoDownloadBtn.style.display = 'block';
+            showToast('✅ Foto berhasil di-HD-kan!');
+
+            photoDownloadBtn.onclick = () => {
+                const link = document.createElement('a');
+                link.download = `${photoFileName}_HD_${scale}x.png`;
+                link.href = result;
+                link.click();
+                showToast('⬇️ Foto HD di-download');
+            };
+        } catch (err) {
+            showToast('❌ Gagal memproses foto');
+        } finally {
+            photoLoading.classList.remove('show');
+            photoEnhanceBtn.disabled = false;
+        }
+    });
+
+    function enhanceImage(img, scale) {
+        return new Promise((resolve) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const newWidth = img.width * scale;
+            const newHeight = img.height * scale;
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+            const imageData = ctx.getImageData(0, 0, newWidth, newHeight);
+            const data = imageData.data;
+            const width = newWidth;
+            const height = newHeight;
+            const kernel = [0, -1, 0, -1, 5, -1, 0, -1, 0];
+            const side = 3;
+            const halfSide = Math.floor(side / 2);
+            const output = ctx.createImageData(width, height);
+            const src = data;
+            const dst = output.data;
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const dstOff = (y * width + x) * 4;
+                    let r = 0, g = 0, b = 0;
+                    for (let cy = 0; cy < side; cy++) {
+                        for (let cx = 0; cx < side; cx++) {
+                            const scy = Math.min(height - 1, Math.max(0, y + cy - halfSide));
+                            const scx = Math.min(width - 1, Math.max(0, x + cx - halfSide));
+                            const srcOff = (scy * width + scx) * 4;
+                            const wt = kernel[cy * side + cx];
+                            r += src[srcOff] * wt;
+                            g += src[srcOff + 1] * wt;
+                            b += src[srcOff + 2] * wt;
+                        }
+                    }
+                    dst[dstOff] = Math.min(255, Math.max(0, r));
+                    dst[dstOff + 1] = Math.min(255, Math.max(0, g));
+                    dst[dstOff + 2] = Math.min(255, Math.max(0, b));
+                    dst[dstOff + 3] = src[dstOff + 3];
+                }
+            }
+
+            ctx.putImageData(output, 0, 0);
+
+            const finalData = ctx.getImageData(0, 0, newWidth, newHeight);
+            const fd = finalData.data;
+            const contrast = 1.15;
+            const brightness = 8;
+            const intercept = 128 * (1 - contrast);
+
+            for (let i = 0; i < fd.length; i += 4) {
+                fd[i] = Math.min(255, Math.max(0, fd[i] * contrast + intercept + brightness));
+                fd[i + 1] = Math.min(255, Math.max(0, fd[i + 1] * contrast + intercept + brightness));
+                fd[i + 2] = Math.min(255, Math.max(0, fd[i + 2] * contrast + intercept + brightness));
+            }
+
+            ctx.putImageData(finalData, 0, 0);
+            resolve(canvas.toDataURL('image/png', 1.0));
+        });
+    }
+
+    // ===== VIDEO =====
+    const videoDropZone = document.getElementById('videoDropZone');
+    const videoInput = document.getElementById('videoInput');
+    const videoEnhanceBtn = document.getElementById('videoEnhanceBtn');
+    const videoLoading = document.getElementById('videoLoading');
+    const videoLoadingText = document.getElementById('videoLoadingText');
+    const videoProgress = document.getElementById('videoProgress');
+    const videoPreviewArea = document.getElementById('videoPreviewArea');
+    const videoResult = document.getElementById('videoResult');
+    const videoDownloadBtn = document.getElementById('videoDownloadBtn');
+    const videoScale = document.getElementById('videoScale');
+
+    let originalVideoFile = null;
+    let videoFileName = '';
+
+    function handleVideoFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith('video/')) {
+            showToast('❌ File harus berupa video!');
+            return;
+        }
+        videoFileName = file.name.replace(/\.[^/.]+$/, '');
+        originalVideoFile = file;
+        videoEnhanceBtn.disabled = false;
+        videoPreviewArea.classList.remove('show');
+        videoDownloadBtn.style.display = 'none';
+        showToast('✅ Video siap di-enhance!');
+    }
+
+    videoDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        videoDropZone.classList.add('dragover');
+    });
+
+    videoDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        videoDropZone.classList.remove('dragover');
+    });
+
+    videoDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        videoDropZone.classList.remove('dragover');
+        handleVideoFile(e.dataTransfer.files[0]);
+    });
+
+    videoDropZone.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'INPUT') videoInput.click();
+    });
+
+    videoInput.addEventListener('change', function() {
+        if (this.files[0]) handleVideoFile(this.files[0]);
+        this.value = '';
+    });
+
+    videoEnhanceBtn.addEventListener('click', async () => {
+        if (!originalVideoFile) return;
+        const scale = parseFloat(videoScale.value);
+        videoEnhanceBtn.disabled = true;
+        videoPreviewArea.classList.remove('show');
+        videoLoading.classList.add('show');
+        videoProgress.style.width = '0%';
+
+        try {
+            const result = await enhanceVideo(originalVideoFile, scale);
+            videoResult.src = result;
+            videoPreviewArea.classList.add('show');
+            videoDownloadBtn.style.display = 'block';
+            showToast('✅ Video berhasil di-HD-kan!');
+
+            videoDownloadBtn.onclick = () => {
+                const link = document.createElement('a');
+                link.download = `${videoFileName}_HD.webm`;
+                link.href = result;
+                link.click();
+                showToast('⬇️ Video HD di-download');
+            };
+        } catch (err) {
+            showToast('❌ Gagal memproses video');
+            console.error(err);
+        } finally {
+            videoLoading.classList.remove('show');
+            videoEnhanceBtn.disabled = false;
+        }
+    });
+
+    async function enhanceVideo(file, scale) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const video = document.createElement('video');
+                video.muted = true;
+                video.playsInline = true;
+                video.src = URL.createObjectURL(file);
+
+                await new Promise((res, rej) => {
+                    video.onloadedmetadata = () => res();
+                    video.onerror = () => rej(new Error('Gagal load video'));
+                });
+
+                const duration = video.duration;
+                const originalWidth = video.videoWidth;
+                const originalHeight = video.videoHeight;
+                const newWidth = Math.floor(originalWidth * scale);
+                const newHeight = Math.floor(originalHeight * scale);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                const ctx = canvas.getContext('2d');
+
+                const fps = 24;
+                const totalFrames = Math.floor(duration * fps);
+
+                const stream = canvas.captureStream(fps);
+                let mimeType = 'video/webm;codecs=vp9';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'video/webm;codecs=vp8';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'video/webm';
+                }
+
+                const recorder = new MediaRecorder(stream, {
+                    mimeType: mimeType,
+                    videoBitsPerSecond: 8000000
+                });
+
+                const chunks = [];
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: mimeType });
+                    resolve(URL.createObjectURL(blob));
+                };
+
+                recorder.start();
+
+                for (let i = 0; i < totalFrames; i++) {
+                    const time = i / fps;
+                    video.currentTime = time;
+
+                    await new Promise(res => {
+                        video.onseeked = () => res();
+                    });
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(video, 0, 0, newWidth, newHeight);
+
+                    videoProgress.style.width = ((i + 1) / totalFrames * 100) + '%';
+                    videoLoadingText.textContent = `Memproses frame ${i + 1}/${totalFrames}...`;
+
+                    if (i % 3 === 0) {
+                        await new Promise(res => setTimeout(res, 10));
+                    }
+                }
+
+                recorder.stop();
+                URL.revokeObjectURL(video.src);
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+</script>
+</body>
+</html>
